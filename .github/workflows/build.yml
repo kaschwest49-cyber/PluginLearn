@@ -1,25 +1,28 @@
-plugins {
-    id 'java'
-}
+name: Build Plugin
 
-group = 'me.kasch'
-version = '1.0'
+on:
+  push:
+    branches: [ "main" ]
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-repositories {
-    mavenCentral()
-    maven {
-        url = 'https://repo.papermc.io/repository/maven-public/'
-    }
-}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-dependencies {
-    compileOnly 'io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT'
-}
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
 
-tasks.jar {a
-    archiveFileName = 'AbilityPlugin.jar'
-}
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: Plugin-Jar
+          path: build/libs/*.jar
